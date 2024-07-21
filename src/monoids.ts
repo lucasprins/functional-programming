@@ -26,3 +26,27 @@
  *
  * Associativity: (False || True) || False == False || (True || False)                      (Result = TRUE)
  */
+
+/**
+ * Represent the Bool monoid with the AND operator as a category:
+ * List the morphisms and their rules of composition
+ *
+ * A monoid is a singleton category,
+ * Objects: A
+ *
+ * In a monoid, every morphism is a morphism from the object to itself
+ * Morphisms:
+ *     - id_A : A -> A
+ *     - True : A -> A (f)
+ *     - False : A -> A (g)
+ *
+ * Composition:
+ *     - id_A . True = True . id_A = True
+ *     - id_A . False = False . id_A = False
+ *
+ *     - True . True = True
+ *     - True . False = False
+ *     - False . True = False
+ *     - False . False = False
+ *
+ */
