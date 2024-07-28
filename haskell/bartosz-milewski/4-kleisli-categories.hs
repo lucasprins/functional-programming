@@ -1,4 +1,4 @@
-module FunctionalProgramming where
+module BartoszMilewski4 where
 
 import Data.Char (toUpper)
 
