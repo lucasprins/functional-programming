@@ -80,6 +80,7 @@ type EitherFactorizer = <Left, Right, Result>(
   j: (b: Right) => Result
 ) => (either: Either<Left, Right>) => Result;
 
+// The factorization morphism from C to C_1
 const factorizeEither: EitherFactorizer = (i, j) => (either) =>
   either.tag === "left" ? i(either.value) : j(either.value);
 
@@ -87,7 +88,6 @@ const Either = {
   match: factorizeEither,
 };
 
-///
 /// Coproduct Usage
 ///
 type UserData = { username: string; token: string };
@@ -109,6 +109,7 @@ const successfulLogin: LoginResult = {
   tag: "left",
   value: { username: "john_doe", token: "abc123" },
 };
+
 const failedLogin: LoginResult = {
   tag: "right",
   value: { message: "Invalid credentials" },
@@ -116,5 +117,11 @@ const failedLogin: LoginResult = {
 
 console.log(handleLoginResult(successfulLogin));
 console.log(handleLoginResult(failedLogin));
+
+// the unit of the coproduct (either) is void. never/void in TS?
+const x: Either<string, never> = {
+  tag: "left",
+  value: "s",
+};
 
 export { Product, Either };

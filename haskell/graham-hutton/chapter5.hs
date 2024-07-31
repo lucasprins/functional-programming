@@ -5,6 +5,15 @@ module Chapter5 where
 import Data.Char
 
 {-
+  List comprehension notation is quite similar to set notation;
+
+  Set: { (a, b ) | a ∈ A, b ∈ B }
+  Haskell: [(a, b) | a < A, b <- B]
+-}
+myZip :: [a] -> [b] -> [(a, b)]
+myZip a' b' = [(a, b) | a <- a', b <- b']
+
+{-
     BASICS
 -}
 -- [x^2 | x <- [1..5]] (generator)
