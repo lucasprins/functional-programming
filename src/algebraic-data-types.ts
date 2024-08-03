@@ -166,9 +166,9 @@ const Shape = {
 const area = (shape: Shape): number =>
   Shape.match<number>(
     shape,
-    (c) => Math.PI * c.radius * c.radius,
-    (r) => r.width * r.height,
-    (s) => s.size * s.size
+    (circle) => Math.PI * circle.radius * circle.radius,
+    (rect) => rect.width * rect.height,
+    (square) => square.size * square.size
   );
 
 const circ = (shape: Shape): number =>

@@ -8,6 +8,11 @@ const left = <L>(value: L): Left<L> => ({ tag: "left", value });
 
 const right = <R>(value: R): Right<R> => ({ tag: "right", value });
 
+// assertions
+const isLeft = <L, R>(e: Either<L, R>): e is Left<L> => e.tag === "left";
+
+const isRight = <L, R>(e: Either<L, R>): e is Right<R> => e.tag === "right";
+
 /**
  * Acts as a factorizer, applies functions to the contents
  */
@@ -16,10 +21,10 @@ const fold = <L, R, T>(
   onLeft: (left: L) => T,
   onRight: (right: R) => T
 ): T => {
-  return either.tag === "left" ? onLeft(either.value) : onRight(either.value);
+  return isLeft(either) ? onLeft(either.value) : onRight(either.value);
 };
 
-const Either = { left, right, fold };
+const Either = { left, right, fold, isLeft, isRight };
 
 export default Either;
 

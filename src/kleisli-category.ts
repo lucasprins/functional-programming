@@ -5,7 +5,8 @@ const makePair = <A, B>(x: A, y: B): Pair<A, B> => [x, y];
 // const negate = (x: boolean): Pair<boolean, string> => makePair(!x, "negate");
 
 /**
- * Moving aggregation of logging out of individual functions
+ * Moving aggregation of logging out of individual functions.
+ * Embellishment,
  */
 type Writer<T> = Pair<T, string>;
 
