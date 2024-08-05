@@ -41,3 +41,5 @@ const getApiKey = (): Reader<Config, string> => (config: Config) =>
 const config: Config = { baseUrl: "https://api.example.com", apiKey: "12345" };
 
 console.log(getApiUrl("users")(config)); // Output: https://api.example.com/users?api_key=12345&key=12345
+
+export {};
