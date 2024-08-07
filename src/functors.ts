@@ -1,6 +1,7 @@
 import { List } from "immutable";
 
 import { Func } from "./core";
+import Either from "./functors/either";
 
 /**
  * Functors
@@ -21,11 +22,8 @@ type Maybe<a> = Nothing | Just<a>; // <-- parameterized type constructor
 const Maybe = {
   nothing: (): Nothing => ({ kind: "nothing" }),
   just: <A>(value: A): Just<A> => ({ kind: "just", value }),
-  match: <A, R>(
-    m: Maybe<A>,
-    onNothing: Func<Nothing, R>,
-    onJust: Func<Just<A>, R>
-  ): R => (m.kind === "just" ? onJust(m) : onNothing(m)),
+  match: <A, R>(m: Maybe<A>, onNothing: Func<Nothing, R>, onJust: Func<Just<A>, R>): R =>
+    m.kind === "just" ? onJust(m) : onNothing(m),
 };
 
 // f :: a -> b
@@ -37,8 +35,6 @@ const isZero = (x: number) => x === 0;
 //     () => Maybe.nothing(),
 //     (just) => Maybe.just(just.value === 0)
 //   );
-
-type FMap = <A, B>(f: Func<A, B>) => Func<Maybe<A>, Maybe<B>>;
 
 const fmapMaybe =
   <A, B>(f: Func<A, B>) =>
@@ -80,12 +76,24 @@ console.log(maybeTail(emptyList));
 
 /**
  * Functor composition
+ *
+ * The term fmap stands for "functor map," and it's a common function associated
+ * with the concept of a functor in functional programming and category theory.
  */
-const composeFmap = <A, B>(f: Func<A, B>) => fmapMaybe(fmapList(f));
+const fmapMaybeList = <A, B>(f: Func<A, B>) => fmapMaybe(fmapList(f));
 
 const square = (x: number) => x * x;
 
 const mis: Maybe<List<number>> = Maybe.just(List([1, 2, 3]));
-const mis2 = composeFmap(square)(mis);
+const mis2 = fmapMaybeList(square)(mis);
 
 console.log(mis2.kind === "just" ? mis2.value.map((v) => v) : ""); // Output: { kind: 'just', value: List [ 1, 4, 9 ] }
+
+const fmapEither = Either.fmap;
+
+const fmapEitherMaybe = <A, B, C>(f: Func<A, B>) => fmapEither(fmapMaybe(f));
+
+const eitherMaybeSquare = fmapEitherMaybe(square);
+
+console.log(eitherMaybeSquare(Either.right(Maybe.just(5))));
+console.log(eitherMaybeSquare(Either.left(Maybe.just(5))));

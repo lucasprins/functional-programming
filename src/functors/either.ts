@@ -1,3 +1,5 @@
+import { List } from "immutable";
+
 // type constructors
 type Left<L> = { tag: "left"; value: L };
 type Right<R> = { tag: "right"; value: R };
@@ -13,9 +15,7 @@ const isLeft = <L, R>(e: Either<L, R>): e is Left<L> => e.tag === "left";
 
 const isRight = <L, R>(e: Either<L, R>): e is Right<R> => e.tag === "right";
 
-/**
- * Acts as a factorizer, applies functions to the contents
- */
+// Acts as a factorizer, applies functions to the contents
 const fold = <L, R, T>(
   either: Either<L, R>,
   onLeft: (left: L) => T,
@@ -24,7 +24,22 @@ const fold = <L, R, T>(
   return isLeft(either) ? onLeft(either.value) : onRight(either.value);
 };
 
-const Either = { left, right, fold, isLeft, isRight };
+// `Left` values will be ignored
+const fmapEither =
+  <L, A, B>(f: (a: A) => B) =>
+  (e: Either<L, A>): Either<L, B> => {
+    return isRight(e) ? right(f(e.value)) : e;
+  };
+
+// Additional functions on Either
+
+const extract = <L, R>(e: Either<L, R>): L | R => e.value;
+
+const lefts = <A, B>(es: List<Either<A, B>>): List<A> => es.filter(isLeft).map(extract);
+
+const rights = <A, B>(es: List<Either<A, B>>): List<B> => es.filter(isRight).map(extract);
+
+const Either = { left, right, fold, fmap: fmapEither, isLeft, isRight, extract, lefts, rights };
 
 export default Either;
 
