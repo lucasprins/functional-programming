@@ -1,3 +1,6 @@
+import { Func, Unit } from "./core";
+import { Product } from "./functors/product";
+
 /**
  * Considering that Bool is a set of two values True and False, show
  * that it forms two (set-theoretical) monoids with respect to, respectively,
@@ -50,3 +53,22 @@
  *     - False . False = False
  *
  */
+
+type Monoid<A> = {
+  getZero: Func<Unit, A>;
+  join: Func<Product<A, A>, A>;
+};
+
+const monoidStringPlus: Monoid<string> = {
+  getZero: () => "",
+  join: ([x, y]) => x + y,
+};
+
+const monoidNumberPlus: Monoid<number> = {
+  getZero: () => 0,
+  join: ([x, y]) => x + y,
+};
+
+export { monoidStringPlus, monoidNumberPlus };
+
+export type { Monoid };

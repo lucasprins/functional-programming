@@ -1,17 +1,15 @@
-import { id } from "../core";
-
 type Reader<R, A> = (r: R) => A;
 
-const map = <R, A, B>(fa: Reader<R, A>, f: (a: A) => B): Reader<R, B> => {
-  return (r: R) => f(fa(r));
+const map = <R, A, B>(reader: Reader<R, A>, f: (a: A) => B): Reader<R, B> => {
+  return (r: R) => f(reader(r));
 };
 
 const of = <R, A>(a: A): Reader<R, A> => {
   return (_: R) => a;
 };
 
-const flatMap = <R, A, B>(fa: Reader<R, A>, f: (a: A) => Reader<R, B>): Reader<R, B> => {
-  return (r: R) => f(fa(r))(r);
+const flatMap = <R, A, B>(reader: Reader<R, A>, f: (a: A) => Reader<R, B>): Reader<R, B> => {
+  return (r: R) => f(reader(r))(r);
 };
 
 const ask = <R>(): Reader<R, R> => {
@@ -22,52 +20,34 @@ const asks = <R, A>(f: (r: R) => A): Reader<R, A> => {
   return (r: R) => f(r);
 };
 
-/////////////
-/////////////
-/////////////
-type Config = {
-  apiUrl: string;
-  apiKey: string;
+const run = <R, A>(reader: Reader<R, A>, env: R): A => {
+  return reader(env);
 };
 
-type Logger = {
-  log: (message: string) => void;
+const Reader = {
+  map,
+  of,
+  flatMap,
+  ask,
+  asks,
+  run,
 };
 
-type Env = {
-  config: Config;
-  logger: Logger;
-};
+export { Reader };
 
-const getEnv: Reader<Env, Env> = ask<Env>();
-const getConfig: Reader<Env, Config> = asks((env: Env) => env.config);
-const getLogger: Reader<Env, Logger> = asks((env: Env) => env.logger);
+/**
+ * Usage
+ */
+type Env = { value: number };
 
-const fetchData = (endpoint: string): Reader<Env, Promise<any>> =>
-  flatMap(getConfig, (config) =>
-    flatMap(ask<Env>(), ({ logger }) => {
-      const url = `${config.apiUrl}/${endpoint}?key=${config.apiKey}`;
-      logger.log(`Fetching data from ${url}`);
+// A Reader that doubles the `value` in the environment.
+const doubleValue: Reader<Env, number> = map(ask<Env>(), (env) => env.value * 2);
 
-      return of(
-        fetch(url)
-          .then((response) => response.json())
-          .then((data) => {
-            logger.log("Data fetched successfully");
-            return data;
-          })
-          .catch((error) => {
-            logger.log(`Error fetching data: ${error}`);
-            throw error;
-          })
-      );
-    })
-  );
+// A Reader that adds 5 to the doubled value.
+const addFive: Reader<Env, number> = flatMap(doubleValue, (doubled) => of(doubled + 5));
 
-// Usage
-const env: Env = {
-  config: { apiUrl: "https://jsonplaceholder.typicode.com", apiKey: "secret-key" },
-  logger: { log: (message: string) => console.log(message) },
-};
+// Running the Reader with an environment
+const env = { value: 10 };
+const result = run(addFive, env);
 
-fetchData("users/1")(env).then((data) => console.log(data));
+console.log(result); // Output: 25
